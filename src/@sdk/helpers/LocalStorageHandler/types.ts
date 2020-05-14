@@ -8,6 +8,7 @@ import { IQueuedJobs } from "@sdk/jobs/QueuedJobs";
 
 export enum LocalStorageItems {
   JOB_QUEUE_CHECKOUT = "job_queueCheckout",
+  TOKEN = "token",
   CHECKOUT = "data_checkout",
   PAYMENT = "data_payment",
 }
