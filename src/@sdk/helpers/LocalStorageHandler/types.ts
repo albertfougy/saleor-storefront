@@ -136,10 +136,3 @@ type IQueuedJobsState<T> = {
 };
 
 export type IJobsModel = IQueuedJobsState<IQueuedJobs>;
-
-export interface ILocalStorageHandler {
-  getCheckout(): ICheckoutModel | null;
-  setCheckout(checkout: ICheckoutModel | null): void;
-  getPayment(): IPaymentModel | null;
-  setPayment(payment: IPaymentModel | null): void;
-}
