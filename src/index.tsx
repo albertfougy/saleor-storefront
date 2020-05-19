@@ -117,10 +117,11 @@ const startApp = async () => {
         }
       }, [updateAvailable]);
 
-      const { authenticated } = useAuth();
+      const { authenticated, user } = useAuth();
       const [prevAuthenticated, setPrevAuthenticated] = React.useState<
         boolean | undefined
       >();
+      console.log(user);
 
       React.useEffect(() => {
         if (prevAuthenticated !== undefined && authenticated !== undefined) {
