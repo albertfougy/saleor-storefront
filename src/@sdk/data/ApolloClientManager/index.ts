@@ -1,9 +1,9 @@
-import ApolloClient, { ApolloQueryResult } from "apollo-client";
+import ApolloClient from "apollo-client";
 
-import { getAuthToken } from "@sdk/auth";
 import { Checkout } from "@sdk/fragments/gqlTypes/Checkout";
 import { OrderDetail } from "@sdk/fragments/gqlTypes/OrderDetail";
 import { Payment } from "@sdk/fragments/gqlTypes/Payment";
+import { User } from "@sdk/fragments/gqlTypes/User";
 import { CountryCode } from "@sdk/gqlTypes/globalTypes";
 import {
   ICheckoutAddress,
@@ -81,41 +81,35 @@ export class ApolloClientManager {
     this.client = client;
   }
 
-  watchUser = (
-    // callback: (newData: any) => void,
-    next: (value: ApolloQueryResult<UserDetails>) => void,
+  subscribeToUserChange = (
+    next: (value: User | null) => void,
     error?: (error: any) => void,
     complete?: () => void
   ) => {
-    /**
-     * I would like to make this working, but Apollo docs cover these methods, thus its hard to use it
-     */
-    // this.client.store.getCache().watch({
-    //   callback: next,
-    //   optimistic: false,
-    //   query: UserQueries.getUserDetailsQuery,
-    // });
-    // .subscribe({
-    //   fetchPolicy: "cache-only",
-    //   query: UserQueries.getUserDetailsQuery,
-    // })
     this.client
       .watchQuery<UserDetails, any>({
         fetchPolicy: "cache-only",
         query: UserQueries.getUserDetailsQuery,
       })
-      .subscribe(next, error, complete);
+      .subscribe(value => next(value.data?.me), error, complete);
   };
 
-  /**
-   * It doesn't work, because Apollo docs cover only 20% of Apollo client
-   */
-  // getUser = async () => {
-  //   return this.client.query<UserDetails, any>({
-  //     fetchPolicy: "network-only",
-  //     query: UserQueries.getUserDetailsQuery,
-  //   });
-  // };
+  getUser = async () => {
+    const { data, errors } = await this.client.query<UserDetails, any>({
+      fetchPolicy: "network-only",
+      query: UserQueries.getUserDetailsQuery,
+    });
+
+    if (errors?.length) {
+      return {
+        error: errors,
+      };
+    } else {
+      return {
+        data: data.me,
+      };
+    }
+  };
 
   signIn = async (email: string, password: string) => {
     const { data, errors } = await this.client.mutate<

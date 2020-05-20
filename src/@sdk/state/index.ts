@@ -60,10 +60,15 @@ export class SaleorState extends NamedObservable<StateItems> {
 
     this.loaded = defaultSaleorStateLoaded;
 
-    this.initState();
+    this.subscribeStateToChanges();
+    this.initializeState();
   }
 
-  private initState = async () => {
+  /**
+   * Subscribes to particular changes occuring in data sources like apollo cache or local storage.
+   * Every update in data source will result in update of respective class member.
+   */
+  private subscribeStateToChanges = () => {
     this.localStorageHandler.subscribeToChange(
       LocalStorageItems.CHECKOUT,
       this.onCheckoutUpdate
@@ -80,11 +85,15 @@ export class SaleorState extends NamedObservable<StateItems> {
       LocalStorageEvents.CLEAR,
       this.onClearLocalStorage
     );
+    this.apolloClientManager.subscribeToUserChange(this.onUserUpdate);
+  };
 
+  /**
+   * Initialize class members with cached or fetched data.
+   */
+  private initializeState = async () => {
     this.provideSignInToken();
-    this.apolloClientManager.watchUser(value => {
-      this.onUserUpdate(value.data?.me);
-    });
+    await this.provideUser(() => null);
     await this.provideCheckout(() => null, true);
     await this.providePayment(true);
     await this.providePaymentGateways(() => null);
@@ -93,17 +102,19 @@ export class SaleorState extends NamedObservable<StateItems> {
   private provideSignInToken = () => {
     this.onSignInTokenUpdate(this.localStorageHandler.getSignInToken());
   };
-  // private provideUser = async () => {
-  //   const result = await this.apolloClientManager.getUser();
-  //   // const res = await result.refetch();
-  //   console.log("r", result);
+  private provideUser = async (
+    onError: (
+      error: ApolloErrorWithUserInput | any,
+      type: DataErrorCheckoutTypes
+    ) => any
+  ) => {
+    const { data, error } = await this.apolloClientManager.getUser();
+    console.log("state", data);
 
-  //   // if (error) {
-  //   //   // onError(error, DataErrorCheckoutTypes.GET_CHECKOUT);
-  //   // } else if (data) {
-  //   // this.onUserUpdate(data.me);
-  //   // }
-  // };
+    if (error) {
+      // onError(error, DataErrorCheckoutTypes.GET_CHECKOUT);
+    }
+  };
   private provideCheckout = async (
     onError: (
       error: ApolloErrorWithUserInput | any,
@@ -160,6 +171,7 @@ export class SaleorState extends NamedObservable<StateItems> {
   };
   private onUserUpdate = (user: User | null) => {
     this.user = user;
+    console.log("update", user);
     this.notifyChange(StateItems.USER, this.user);
     this.onLoadedUpdate({
       user: true,
@@ -212,7 +224,7 @@ export class SaleorState extends NamedObservable<StateItems> {
       checkout?.token
     );
 
-    console.log("er", data, error);
+    console.log("provideCheckoutOnline", data, error);
 
     if (error) {
       onError(error, DataErrorCheckoutTypes.GET_CHECKOUT);
