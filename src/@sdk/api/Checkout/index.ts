@@ -1,3 +1,4 @@
+import { PaymentGateway } from "@sdk/fragments/gqlTypes/PaymentGateway";
 import { ErrorListener } from "@sdk/helpers";
 import {
   ICheckoutModel,
@@ -12,7 +13,6 @@ import {
   DataErrorCheckoutTypes,
   FunctionErrorCheckoutTypes,
   IAddress,
-  IAvailablePaymentGateways,
   IAvailableShippingMethods,
   ICheckout,
   ICreditCard,
@@ -28,7 +28,7 @@ export class SaleorCheckoutAPI extends ErrorListener {
   selectedShippingAddressId?: string;
   selectedBillingAddressId?: string;
   availableShippingMethods?: IAvailableShippingMethods;
-  availablePaymentGateways?: IAvailablePaymentGateways;
+  availablePaymentGateways?: PaymentGateway[];
   payment?: IPayment;
 
   private saleorState: SaleorState;
@@ -95,7 +95,7 @@ export class SaleorCheckoutAPI extends ErrorListener {
     );
     this.saleorState.subscribeToChange(
       StateItems.PAYMENT_GATEWAYS,
-      (paymentGateways: IAvailablePaymentGateways) => {
+      (paymentGateways: PaymentGateway[]) => {
         console.log("StateItems.PAYMENT_GATEWAYS", paymentGateways);
         this.availablePaymentGateways = paymentGateways;
       }

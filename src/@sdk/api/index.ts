@@ -45,17 +45,18 @@ export class SaleorAPI {
 
     const localStorageHandler = new LocalStorageHandler();
     const apolloClientManager = new ApolloClientManager(client);
-    const saleorState = new SaleorState(
+    const jobsManager = new JobsManager(
       localStorageHandler,
       apolloClientManager
+    );
+    const saleorState = new SaleorState(
+      localStorageHandler,
+      apolloClientManager,
+      jobsManager
     );
     const localStorageManager = new LocalStorageManager(
       localStorageHandler,
       saleorState
-    );
-    const jobsManager = new JobsManager(
-      localStorageHandler,
-      apolloClientManager
     );
 
     if (onStateUpdate) {

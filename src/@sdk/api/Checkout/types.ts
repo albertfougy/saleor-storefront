@@ -27,7 +27,6 @@ export interface IAddress {
 }
 
 export type IAvailableShippingMethods = Checkout_availableShippingMethods[];
-export type IAvailablePaymentGateways = GetShopPaymentGateways_shop_availablePaymentGateways[];
 
 export interface IShippingMethod {
   id: string;

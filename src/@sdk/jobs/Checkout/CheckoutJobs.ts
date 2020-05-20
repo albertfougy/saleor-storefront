@@ -26,6 +26,51 @@ export class CheckoutJobs {
     this.localStorageHandler = localStorageHandler;
   }
 
+  provideCheckout = async ({
+    isUserSignedIn,
+  }: {
+    isUserSignedIn: boolean;
+  }): PromiseCheckoutJobRunResponse => {
+    const checkout = this.localStorageHandler.getCheckout();
+
+    const { data, error } = await this.apolloClientManager.getCheckout(
+      isUserSignedIn,
+      checkout?.token
+    );
+
+    if (error) {
+      return {
+        dataError: {
+          error,
+          type: DataErrorCheckoutTypes.GET_CHECKOUT,
+        },
+      };
+    } else {
+      this.localStorageHandler.setCheckout(data || checkout);
+
+      return {
+        data,
+      };
+    }
+  };
+
+  providePaymentGateways = async (): PromiseCheckoutJobRunResponse => {
+    const { data, error } = await this.apolloClientManager.getPaymentGateways();
+
+    if (error) {
+      return {
+        dataError: {
+          error,
+          type: DataErrorCheckoutTypes.GET_PAYMENT_GATEWAYS,
+        },
+      };
+    }
+
+    return {
+      data,
+    };
+  };
+
   createCheckout = async ({
     email,
     lines,

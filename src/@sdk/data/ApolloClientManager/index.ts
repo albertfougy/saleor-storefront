@@ -3,6 +3,7 @@ import ApolloClient from "apollo-client";
 import { Checkout } from "@sdk/fragments/gqlTypes/Checkout";
 import { OrderDetail } from "@sdk/fragments/gqlTypes/OrderDetail";
 import { Payment } from "@sdk/fragments/gqlTypes/Payment";
+import { PaymentGateway } from "@sdk/fragments/gqlTypes/PaymentGateway";
 import { User } from "@sdk/fragments/gqlTypes/User";
 import { CountryCode } from "@sdk/gqlTypes/globalTypes";
 import {
@@ -92,6 +93,23 @@ export class ApolloClientManager {
         query: UserQueries.getUserDetailsQuery,
       })
       .subscribe(value => next(value.data?.me), error, complete);
+  };
+
+  subscribeToPaymentGatewaysChange = (
+    next: (value: PaymentGateway[] | null) => void,
+    error?: (error: any) => void,
+    complete?: () => void
+  ) => {
+    this.client
+      .watchQuery<GetShopPaymentGateways, any>({
+        fetchPolicy: "cache-only",
+        query: ShopQueries.getShopPaymentGateways,
+      })
+      .subscribe(
+        value => next(value.data.shop?.availablePaymentGateways),
+        error,
+        complete
+      );
   };
 
   getUser = async () => {
@@ -342,41 +360,23 @@ export class ApolloClientManager {
   };
 
   getPaymentGateways = async () => {
-    let paymentGateways:
-      | GetShopPaymentGateways_shop_availablePaymentGateways[]
-      | null;
-    try {
-      paymentGateways = await new Promise((resolve, reject) => {
-        const observable = this.client.watchQuery<GetShopPaymentGateways, any>({
-          fetchPolicy: "network-only",
-          query: ShopQueries.getShopPaymentGateways,
-        });
-        observable.subscribe(
-          result => {
-            const { data, errors } = result;
-            if (errors?.length) {
-              reject(errors);
-            } else {
-              resolve(data.shop.availablePaymentGateways);
-            }
-          },
-          error => {
-            reject(error);
-          }
-        );
-      });
+    const { data, errors } = await this.client.query<
+      GetShopPaymentGateways,
+      any
+    >({
+      fetchPolicy: "network-only",
+      query: ShopQueries.getShopPaymentGateways,
+    });
 
-      if (paymentGateways) {
-        return {
-          data: paymentGateways,
-        };
-      }
-    } catch (error) {
+    if (errors?.length) {
       return {
-        error,
+        error: errors,
+      };
+    } else {
+      return {
+        data: data.shop.availablePaymentGateways,
       };
     }
-    return {};
   };
 
   createCheckout = async (
