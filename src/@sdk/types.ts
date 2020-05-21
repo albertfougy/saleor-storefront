@@ -30,6 +30,5 @@ export interface Config {
   loadOnStart: {
     auth: boolean;
     checkout: boolean;
-    cart: boolean;
   };
 }

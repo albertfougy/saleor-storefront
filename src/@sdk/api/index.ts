@@ -41,7 +41,6 @@ export class SaleorAPI {
         ...config?.loadOnStart,
       },
     };
-    const { loadOnStart } = finalConfig;
 
     const localStorageHandler = new LocalStorageHandler();
     const apolloClientManager = new ApolloClientManager(client);
@@ -50,6 +49,7 @@ export class SaleorAPI {
       apolloClientManager
     );
     const saleorState = new SaleorState(
+      finalConfig,
       localStorageHandler,
       apolloClientManager,
       jobsManager
@@ -63,17 +63,12 @@ export class SaleorAPI {
       saleorState.subscribeToNotifiedChanges(onStateUpdate);
     }
 
-    this.auth = new AuthAPI(saleorState, loadOnStart.auth, jobsManager);
-    this.checkout = new SaleorCheckoutAPI(
-      saleorState,
-      loadOnStart.checkout,
-      jobsManager
-    );
+    this.auth = new AuthAPI(saleorState, jobsManager);
+    this.checkout = new SaleorCheckoutAPI(saleorState, jobsManager);
     this.cart = new SaleorCartAPI(
       localStorageManager,
       apolloClientManager,
       saleorState,
-      loadOnStart.cart,
       jobsManager
     );
 

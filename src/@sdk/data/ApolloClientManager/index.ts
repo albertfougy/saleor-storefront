@@ -65,10 +65,7 @@ import {
   CheckoutProductVariants,
   CheckoutProductVariants_productVariants,
 } from "@sdk/queries/gqlTypes/CheckoutProductVariants";
-import {
-  GetShopPaymentGateways,
-  GetShopPaymentGateways_shop_availablePaymentGateways,
-} from "@sdk/queries/gqlTypes/GetShopPaymentGateways";
+import { GetShopPaymentGateways } from "@sdk/queries/gqlTypes/GetShopPaymentGateways";
 import { UserCheckoutDetails } from "@sdk/queries/gqlTypes/UserCheckoutDetails";
 import { UserDetails } from "@sdk/queries/gqlTypes/UserDetails";
 import * as ShopQueries from "@sdk/queries/shop";

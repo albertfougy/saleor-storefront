@@ -12,6 +12,7 @@ import {
   LocalStorageItems,
 } from "../helpers/LocalStorageHandler";
 import { JobsManager } from "../jobs";
+import { Config } from "../types";
 import { ISaleorStateSummeryPrices, StateItems } from "./types";
 
 export interface SaleorStateLoaded {
@@ -51,6 +52,7 @@ export class SaleorState extends NamedObservable<StateItems> {
   private jobsManager: JobsManager;
 
   constructor(
+    config: Config,
     localStorageHandler: LocalStorageHandler,
     apolloClientManager: ApolloClientManager,
     jobsManager: JobsManager
@@ -63,7 +65,7 @@ export class SaleorState extends NamedObservable<StateItems> {
     this.loaded = defaultSaleorStateLoaded;
 
     this.subscribeStateToChanges();
-    this.initializeState();
+    this.initializeState(config);
   }
 
   /**
@@ -96,14 +98,22 @@ export class SaleorState extends NamedObservable<StateItems> {
   /**
    * Initialize class members with cached or fetched data.
    */
-  private initializeState = async () => {
-    this.onSignInTokenUpdate(this.localStorageHandler.getSignInToken());
-    await this.jobsManager.run("auth", "provideUser", undefined);
-    await this.jobsManager.run("checkout", "provideCheckout", {
-      isUserSignedIn: !!this.user,
-    });
-    this.onPaymentUpdate(this.localStorageHandler.getPayment());
-    await this.jobsManager.run("checkout", "providePaymentGateways", undefined);
+  private initializeState = async (config: Config) => {
+    if (config.loadOnStart.auth) {
+      this.onSignInTokenUpdate(this.localStorageHandler.getSignInToken());
+      await this.jobsManager.run("auth", "provideUser", undefined);
+    }
+    if (config.loadOnStart.checkout) {
+      await this.jobsManager.run("checkout", "provideCheckout", {
+        isUserSignedIn: !!this.user,
+      });
+      this.onPaymentUpdate(this.localStorageHandler.getPayment());
+      await this.jobsManager.run(
+        "checkout",
+        "providePaymentGateways",
+        undefined
+      );
+    }
   };
 
   private onLoadedUpdate = (newLoaded: Partial<SaleorStateLoaded>) => {
@@ -129,7 +139,6 @@ export class SaleorState extends NamedObservable<StateItems> {
   };
   private onUserUpdate = (user: User | null) => {
     this.user = user;
-    console.log("update", user);
     this.notifyChange(StateItems.USER, this.user);
     this.onLoadedUpdate({
       user: true,

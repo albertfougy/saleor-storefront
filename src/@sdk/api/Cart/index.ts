@@ -32,7 +32,6 @@ export class SaleorCartAPI extends ErrorListener {
     localStorageManager: LocalStorageManager,
     apolloClientManager: ApolloClientManager,
     saleorState: SaleorState,
-    loadOnStart: boolean,
     jobsManager: JobsManager
   ) {
     super();
@@ -80,22 +79,9 @@ export class SaleorCartAPI extends ErrorListener {
         this.loaded = loaded.checkout && loaded.summaryPrices;
       }
     );
-
-    // if (loadOnStart) {
-    //   this.load();
-    // }
   }
 
-  // load = async () => {
-  //   await this.saleorState.provideCheckout(this.fireError, true);
-  //   return {
-  //     pending: false,
-  //   };
-  // };
-
   addItem = async (variantId: string, quantity: number) => {
-    // await this.saleorState.provideCheckout(this.fireError);
-
     // 1. save in local storage
     this.localStorageManager.addItemToCart(variantId, quantity);
 
@@ -129,8 +115,6 @@ export class SaleorCartAPI extends ErrorListener {
   };
 
   removeItem = async (variantId: string) => {
-    // await this.saleorState.provideCheckout(this.fireError);
-
     // 1. save in local storage
     this.localStorageManager.removeItemFromCart(variantId);
     // 2. save online if possible (if checkout id available)
@@ -163,8 +147,6 @@ export class SaleorCartAPI extends ErrorListener {
   };
 
   subtractItem = async (variantId: string) => {
-    // await this.saleorState.provideCheckout(this.fireError);
-
     // 1. save in local storage
     this.localStorageManager.subtractItemFromCart(variantId);
 
@@ -198,8 +180,6 @@ export class SaleorCartAPI extends ErrorListener {
   };
 
   updateItem = async (variantId: string, quantity: number) => {
-    // await this.saleorState.provideCheckout(this.fireError);
-
     // 1. save in local storage
     this.localStorageManager.updateItemInCart(variantId, quantity);
 

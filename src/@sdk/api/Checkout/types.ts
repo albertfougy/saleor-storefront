@@ -4,7 +4,6 @@ import {
   ICheckoutModelPriceValue,
   IPaymentCreditCard,
 } from "@sdk/helpers/LocalStorageHandler";
-import { GetShopPaymentGateways_shop_availablePaymentGateways } from "@sdk/queries/gqlTypes/GetShopPaymentGateways";
 
 export type IPrice = ICheckoutModelPrice | null | undefined;
 export type IPriceValue = ICheckoutModelPriceValue | null | undefined;
