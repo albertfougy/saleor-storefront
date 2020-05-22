@@ -6,7 +6,7 @@ import {
 } from "apollo-client";
 import { GraphQLError } from "graphql";
 
-import { fireSignOut, getAuthToken, setAuthToken } from "../auth";
+import { getAuthToken, setAuthToken } from "../auth";
 import { MUTATIONS } from "../mutations";
 import { TokenAuth } from "../mutations/gqlTypes/TokenAuth";
 import { QUERIES } from "../queries";
@@ -153,17 +153,6 @@ export class APIProxy {
         });
 
         resolve(data);
-      } catch (e) {
-        reject(e);
-      }
-    });
-
-  signOut = () =>
-    new Promise(async (resolve, reject) => {
-      try {
-        fireSignOut(this.client);
-
-        resolve();
       } catch (e) {
         reject(e);
       }
