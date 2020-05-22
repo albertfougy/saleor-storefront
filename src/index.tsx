@@ -7,6 +7,7 @@ import {
 } from "apollo-cache-inmemory";
 import { persistCache } from "apollo-cache-persist";
 import { ApolloClient } from "apollo-client";
+import { ApolloLink } from "apollo-link";
 import * as React from "react";
 import { positions, Provider as AlertProvider, useAlert } from "react-alert";
 import { ApolloProvider } from "react-apollo";
@@ -36,11 +37,7 @@ import {
 import { history } from "./history";
 
 import { createSaleorClient } from "./@sdk";
-import {
-  authLink,
-  fireSignOut,
-  invalidTokenLinkWithTokenHandler,
-} from "./@sdk/auth";
+import { authLink } from "./@sdk/auth";
 
 const cache = new InMemoryCache({
   dataIdFromObject: obj => {
@@ -68,27 +65,6 @@ const startApp = async () => {
   const notificationOptions = {
     position: positions.BOTTOM_RIGHT,
     timeout: 2500,
-  };
-
-  /**
-   * This is temporary adapter for queries and mutations not included in SDK to handle invalid token error for them.
-   * Note, that after all GraphQL queries and mutations will be replaced by SDK methods, this adapter is going to be removed.
-   */
-  const ApolloClientInvalidTokenLinkAdapter = ({ children }) => {
-    const tokenExpirationCallback = () => {
-      fireSignOut(apolloClient);
-    };
-
-    const { link: invalidTokenLink } = invalidTokenLinkWithTokenHandler(
-      tokenExpirationCallback
-    );
-
-    const apolloClient = React.useMemo(
-      () => createSaleorClient(apiUrl, invalidTokenLink, authLink, cache),
-      []
-    );
-
-    return children(apolloClient);
   };
 
   const Root = hot(module)(() => {
@@ -148,25 +124,37 @@ const startApp = async () => {
       return null;
     };
 
+    const [apolloClient, setApolloClient] = React.useState<
+      ApolloClient<NormalizedCacheObject>
+    >();
+
+    const attachApolloClientToSaleor = (invalidTokenLink: ApolloLink) => {
+      const client = createSaleorClient(
+        apiUrl,
+        invalidTokenLink,
+        authLink,
+        cache
+      );
+      setApolloClient(client);
+
+      return client;
+    };
+
     return (
       <Router history={history}>
         <QueryParamProvider ReactRouterRoute={Route}>
-          <ApolloClientInvalidTokenLinkAdapter>
-            {(apolloClient: ApolloClient<NormalizedCacheObject>) =>
-              apolloClient && (
-                <ApolloProvider client={apolloClient}>
-                  <SaleorProvider client={apolloClient}>
-                    <ShopProvider>
-                      <OverlayProvider>
-                        <App />
-                        <Notifications />
-                      </OverlayProvider>
-                    </ShopProvider>
-                  </SaleorProvider>
-                </ApolloProvider>
-              )
-            }
-          </ApolloClientInvalidTokenLinkAdapter>
+          <SaleorProvider attachApolloClient={attachApolloClientToSaleor}>
+            {apolloClient && (
+              <ApolloProvider client={apolloClient}>
+                <ShopProvider>
+                  <OverlayProvider>
+                    <App />
+                    <Notifications />
+                  </OverlayProvider>
+                </ShopProvider>
+              </ApolloProvider>
+            )}
+          </SaleorProvider>
         </QueryParamProvider>
       </Router>
     );
