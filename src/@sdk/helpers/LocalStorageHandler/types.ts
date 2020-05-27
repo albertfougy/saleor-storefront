@@ -129,11 +129,6 @@ export interface IOrderModel {
   number?: string | null;
 }
 
-export type IJobsGroupModel<G extends keyof IQueuedJobs> = Record<
-  keyof IQueuedJobs[G],
-  boolean
->;
-
 type IQueuedJobsState<T> = {
   [P in keyof T]?: Partial<Record<keyof T[P], boolean>>;
 };
