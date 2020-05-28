@@ -8,7 +8,7 @@ import { AccountErrorCode } from "./../../gqlTypes/globalTypes";
 // GraphQL mutation operation: TokenAuth
 // ====================================================
 
-export interface TokenAuth_tokenCreate_accountErrors {
+export interface TokenAuth_tokenCreate_errors {
   __typename: "AccountError";
   /**
    * The error code.
@@ -172,7 +172,7 @@ export interface TokenAuth_tokenCreate {
   /**
    * List of errors that occurred executing the mutation.
    */
-  accountErrors: TokenAuth_tokenCreate_accountErrors[];
+  errors: TokenAuth_tokenCreate_errors[];
   /**
    * A user instance.
    */

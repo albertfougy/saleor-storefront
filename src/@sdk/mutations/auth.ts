@@ -7,7 +7,7 @@ export const tokenAuthMutation = gql`
   mutation TokenAuth($email: String!, $password: String!) {
     tokenCreate(email: $email, password: $password) {
       token
-      accountErrors {
+      errors: accountErrors {
         code
         field
         message

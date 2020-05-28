@@ -162,9 +162,9 @@ export class ApolloClientManager {
       return {
         error: errors,
       };
-    } else if (data?.tokenCreate?.accountErrors.length) {
+    } else if (data?.tokenCreate?.errors.length) {
       return {
-        error: data.tokenCreate.accountErrors,
+        error: data.tokenCreate.errors,
       };
     } else {
       return {
