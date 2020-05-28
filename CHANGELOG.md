@@ -6,6 +6,7 @@ All notable, unreleased changes to this project will be documented in this file.
 
 - Add Cypress tags to all of the buttons (also speed up tests) - #718 by @krzysztofwolski
 - Automatically choose variant attributes from url in ProductVariantPicker - #708 by @AlicjaSzu
+- Create auth in SDK with useAuth() hook - #727 by @orzechdev
 
 ## 2.10.1
 
