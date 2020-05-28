@@ -121,7 +121,7 @@ export class ApolloClientManager {
       };
     } else {
       return {
-        data: data.me,
+        data: data?.me,
       };
     }
   };
@@ -133,22 +133,10 @@ export class ApolloClientManager {
     >({
       mutation: AuthMutations.tokenAuthMutation,
       update: (store, { data }) => {
-        let storeData: UserDetails | null = null;
-        try {
-          storeData = store.readQuery<UserDetails>({
-            query: UserQueries.getUserDetailsQuery,
-          });
-        } catch (e) {
-          // https://github.com/apollographql/apollo-feature-requests/issues/1
-        }
-
-        const updateDataMe = { ...storeData?.me, ...data?.tokenCreate?.user };
+        const updateDataMe = data?.tokenCreate?.user;
 
         store.writeQuery({
-          data: {
-            ...storeData,
-            me: updateDataMe,
-          },
+          data: updateDataMe ? { me: updateDataMe } : {},
           query: UserQueries.getUserDetailsQuery,
         });
       },
