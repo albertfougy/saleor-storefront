@@ -40,7 +40,7 @@ export function SaleorProvider<TCacheShape = any>({
     manager.connect(saleorAPI => setContext({ ...saleorAPI }));
 
     return manager;
-  }, [apolloClient]);
+  }, []);
 
   return (
     <SaleorContext.Provider value={context}>
