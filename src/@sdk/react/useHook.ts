@@ -7,7 +7,7 @@ const useHook = <T extends keyof SaleorAPI>(dataName: T): SaleorAPI[T] => {
 
   const getHookData = React.useMemo(() => {
     return saleor[dataName];
-  }, []);
+  }, [dataName]);
 
   return getHookData;
 };
